@@ -2,18 +2,11 @@ import pygame
 import random
 import asyncio
 import sys
-import os
-
-# Handle asset paths whether running from source or bundled .exe
-base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
-
-def asset_path(relative_path):
-    return os.path.join(base_path, relative_path)
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
-# Screen setup
+# Global Constants
 screen_width = 900
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
@@ -21,7 +14,7 @@ pygame.display.set_caption("Alien Capture")
 clock = pygame.time.Clock()
 FPS = 60
 
-# Game state
+# Globals for game state
 lives = 3
 score = 0
 game_over = False
@@ -34,14 +27,14 @@ message_timer = 0
 
 # Load assets
 try:
-    pygame.mixer.music.load(asset_path("assets/music2.mp3"))
+    pygame.mixer.music.load("assets/music2.mp3")
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.5)
 except:
     print("Could not load or play music.")
 
 try:
-    background = pygame.image.load(asset_path("assets/background.PNG"))
+    background = pygame.image.load("assets/background.PNG")
     background = pygame.transform.scale(background, (screen_width, screen_height))
 except:
     print("Error: Could not load background image.")
@@ -49,13 +42,13 @@ except:
     sys.exit()
 
 try:
-    confetti_img = pygame.image.load(asset_path("assets/confetti.png"))
+    confetti_img = pygame.image.load("assets/confetti.png")
     confetti_img = pygame.transform.scale(confetti_img, (900, 600))
 except:
     confetti_img = None
 
 try:
-    ben10_adult = pygame.image.load(asset_path("assets/ben10_adult.png"))
+    ben10_adult = pygame.image.load("assets/ben10_adult.png")
     ben10_adult = pygame.transform.scale(ben10_adult, (screen_width, screen_height))
 except:
     ben10_adult = None
@@ -63,7 +56,7 @@ except:
 alien_images = []
 for i in range(1, 30):
     try:
-        img = pygame.image.load(asset_path(f"assets/alien{i}.png"))
+        img = pygame.image.load(f"assets/alien{i}.png")
         img = pygame.transform.scale(img, (260, 400))
         alien_images.append(img)
     except:
@@ -75,31 +68,30 @@ if not alien_images:
     sys.exit()
 
 try:
-    font = pygame.font.Font(asset_path("assets/lands.otf"), 36)
+    font = pygame.font.Font("assets/lands.otf", 36)
 except:
     font = pygame.font.SysFont("arial", 36)
 
 try:
-    bday_font = pygame.font.Font(asset_path("assets/bday.ttf"), 28)
+    bday_font = pygame.font.Font("assets/bday.ttf", 28)
 except:
     bday_font = pygame.font.SysFont("arial", 28)
 
 try:
-    gameover_font = pygame.font.Font(asset_path("assets/gameover.otf"), 30)
+    gameover_font = pygame.font.Font("assets/gameover.otf", 30)
 except:
     gameover_font = pygame.font.SysFont("arial", 30)
 
-replay_font = pygame.font.Font(asset_path("assets/replay.ttf"), 18)
+replay_font = pygame.font.Font("assets/replay.ttf", 18)
 replay_button = pygame.Rect(screen_width - 140, 20, 120, 40)
 current_alien = random.choice(alien_images)
 alien_rect = current_alien.get_rect()
 
-# Text drawing
+# Helper Functions
 def draw_text(text, colour, x, y, font_used=font):
     label = font_used.render(text, True, colour)
     screen.blit(label, (x, y))
 
-# Start screen
 def show_start_screen():
     screen.fill((0, 0, 0))
     surprise_text = font.render("Score 21 for a surprise!", True, (57, 255, 20))
@@ -117,7 +109,6 @@ def show_start_screen():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 waiting = False
 
-# Reset
 def reset_game():
     global lives, score, game_over, alien_visible, last_flash, special_shown
     lives = 3
@@ -128,11 +119,11 @@ def reset_game():
     last_flash = pygame.time.get_ticks()
     pygame.mixer.music.stop()
     try:
-        pygame.mixer.music.load(asset_path("assets/music2.mp3"))
+        pygame.mixer.music.load("assets/music2.mp3")
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.5)
     except:
-        print("Could not reload music.")
+        print("Could not reload or play original music.")
 
 # Main game loop
 async def main():
@@ -141,8 +132,8 @@ async def main():
 
     show_start_screen()
     reset_game()
-    run = True
 
+    run = True
     while run:
         screen.blit(background, (0, 0))
         current_time = pygame.time.get_ticks()
@@ -193,7 +184,7 @@ async def main():
         if score >= 21 and not special_shown:
             pygame.mixer.music.stop()
             try:
-                pygame.mixer.music.load(asset_path("assets/hbd_song.mp3"))
+                pygame.mixer.music.load("assets/hbd_song.mp3")
                 pygame.mixer.music.play()
             except:
                 print("Could not load or play birthday song.")
@@ -235,4 +226,6 @@ async def main():
 
     pygame.quit()
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
+    
